@@ -44,6 +44,8 @@ copy_defconfig () {
 	make ARCH=arm CROSS_COMPILE="${CC}" distclean
 	make ARCH=arm CROSS_COMPILE="${CC}" ${config}
 	cp -v .config ${DIR}/patches/ref_${config}
+	sed -i -e 's:CONFIG_LOCALVERSION_AUTO=y:# CONFIG_LOCALVERSION_AUTO is not set:g' .config
+	sed -i -e 's:CONFIG_DEBUG_INFO=y:# CONFIG_DEBUG_INFO is not set:g' .config
 	cd ${DIR}/
 }
 
