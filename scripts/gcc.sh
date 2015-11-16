@@ -29,18 +29,24 @@ DIR=$PWD
 #toolchain
 . "${DIR}/version.sh"
 
+if [ -d $HOME/dl/gcc/ ] ; then
+	gcc_dir="$HOME/dl/gcc"
+else
+	gcc_dir="${DIR}/dl"
+fi
+
 dl_gcc_generic () {
-	WGET="wget -c --directory-prefix=${DIR}/dl/"
-	if [ ! -f "${DIR}/dl/${directory}/${datestamp}" ] ; then
+	WGET="wget -c --directory-prefix=${gcc_dir}/"
+	if [ ! -f "${gcc_dir}/${directory}/${datestamp}" ] ; then
 		echo "Installing: ${toolchain_name}"
 		echo "-----------------------------"
 		${WGET} "${site}/${version}/${filename}" || ${WGET} "${archive_site}/${version}/${filename}"
-		if [ -d "${DIR}/dl/${directory}" ] ; then
-			rm -rf "${DIR}/dl/${directory}" || true
+		if [ -d "${gcc_dir}/${directory}" ] ; then
+			rm -rf "${gcc_dir}/${directory}" || true
 		fi
-		tar -xf "${DIR}/dl/${filename}" -C "${DIR}/dl/"
-		if [ -f "${DIR}/dl/${directory}/${binary}gcc" ] ; then
-			touch "${DIR}/dl/${directory}/${datestamp}"
+		tar -xf "${gcc_dir}/${filename}" -C "${gcc_dir}/"
+		if [ -f "${gcc_dir}/${directory}/${binary}gcc" ] ; then
+			touch "${gcc_dir}/${directory}/${datestamp}"
 		fi
 	fi
 
@@ -48,7 +54,7 @@ dl_gcc_generic () {
 		#using native gcc
 		CC=
 	else
-		CC="${DIR}/dl/${directory}/${binary}"
+		CC="${gcc_dir}/${directory}/${binary}"
 	fi
 }
 
@@ -202,6 +208,23 @@ gcc_toolchain () {
 		gcc_version="5.1"
 		release="15.08"
 		target="arm-linux-gnueabihf"
+
+		version="components/toolchain/binaries/${gcc_version}-20${release}/${target}"
+		filename="gcc-linaro-${gcc_version}-20${release}-x86_64_${target}.tar.xz"
+		directory="gcc-linaro-${gcc_version}-20${release}-x86_64_${target}"
+
+		datestamp="${gcc_version}-20${release}-${target}"
+
+		binary="bin/${target}-"
+		;;
+	gcc_linaro_aarch64_gnu_5)
+		#
+		#https://releases.linaro.org/components/toolchain/binaries/5.1-2015.08/aarch64-linux-gnu/gcc-linaro-5.1-2015.08-x86_64_aarch64-linux-gnu.tar.xz
+		#
+
+		gcc_version="5.1"
+		release="15.08"
+		target="aarch64-linux-gnu"
 
 		version="components/toolchain/binaries/${gcc_version}-20${release}/${target}"
 		filename="gcc-linaro-${gcc_version}-20${release}-x86_64_${target}.tar.xz"
