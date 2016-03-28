@@ -4,7 +4,7 @@ ARCH=$(uname -m)
 
 config="omap2plus_defconfig"
 
-build_prefix="omap2plus-r"
+build_prefix="-omap2plus-r"
 branch_prefix="v"
 branch_postfix=".x"
 
