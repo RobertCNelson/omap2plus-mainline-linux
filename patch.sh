@@ -247,8 +247,6 @@ post_backports () {
 		mkdir -p ../patches/backports/${subsystem}/
 	fi
 	${git_bin} format-patch -1 -o ../patches/backports/${subsystem}/
-
-	exit 2
 }
 
 patch_backports (){
@@ -267,8 +265,10 @@ backports () {
 		cp -v ~/linux-src/x/ ./x/
 
 		post_backports
+		exit 2
+	else
+		patch_backports
 	fi
-	patch_backports
 }
 
 ###
