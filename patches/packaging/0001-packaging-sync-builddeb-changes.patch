@@ -1,6 +1,6 @@
-From f5d106da5357a47d654983fbbb8e3f1178a2c392 Mon Sep 17 00:00:00 2001
+From 41d369299fd71e444fe0c429d90ab1e739b7f153 Mon Sep 17 00:00:00 2001
 From: Robert Nelson <robertcnelson@gmail.com>
-Date: Sun, 22 Jan 2017 16:00:33 -0600
+Date: Sat, 13 May 2017 19:43:27 -0500
 Subject: [PATCH] packaging: sync builddeb changes
 
 Signed-off-by: Robert Nelson <robertcnelson@gmail.com>
@@ -9,11 +9,11 @@ Signed-off-by: Robert Nelson <robertcnelson@gmail.com>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c575cd07888..1d46d7dcd6b0 100755
+index aad67000e4dd..29759234a50f 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -151,9 +151,18 @@ else
- fi
+@@ -146,9 +146,18 @@ fi
+ cp "$($MAKE -s image_name)" "$tmpdir/$installed_image_path"
  
  if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
 +	mkdir -p "$tmpdir/boot/dtbs/$version"
