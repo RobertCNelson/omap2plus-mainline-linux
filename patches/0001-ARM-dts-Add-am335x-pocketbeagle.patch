@@ -3,7 +3,7 @@ From: Robert Nelson <robertcnelson@gmail.com>
 Date: Mon, 16 Apr 2018 14:23:15 -0500
 Subject: [PATCH] ARM: dts: Add am335x-pocketbeagle
 
-PocketBeagle Blue is an ultra-tiny-yet-complete open-source USB-key-fob computer.
+PocketBeagle is an ultra-tiny-yet-complete open-source USB-key-fob computer.
 
 This board can be indentified by the BPxx value after A335BNLT (BBB)
 in the at24 eeprom:
@@ -18,10 +18,17 @@ CC: Jason Kridner <jkridner@beagleboard.org>
 CC: Drew Fustini <drew@beagleboard.org>
 CC: Peter Robinson <pbrobinson@redhat.com>
 ---
+Changes in v2:
+- Use SPDX tags.
+- Use eeprom@50, remove repeated node and fix  and remove '_' to fix node_name_chars_strict Warning
+- Fix: PocketBeagle Name in Subject (not PocketBeagle Blue)
+- Fix: leds remove '_' to fix node_name_chars_strict warning
+- Fix: node_name_chars_strict pinmux_*_pins label's.
+---
  arch/arm/boot/dts/Makefile                   |   1 +
- arch/arm/boot/dts/am335x-osd335x-common.dtsi | 136 +++++++++++
- arch/arm/boot/dts/am335x-pocketbeagle.dts    | 244 +++++++++++++++++++
- 3 files changed, 381 insertions(+)
+ arch/arm/boot/dts/am335x-osd335x-common.dtsi | 124 ++++++++++
+ arch/arm/boot/dts/am335x-pocketbeagle.dts    | 237 +++++++++++++++++++
+ 3 files changed, 362 insertions(+)
  create mode 100644 arch/arm/boot/dts/am335x-osd335x-common.dtsi
  create mode 100644 arch/arm/boot/dts/am335x-pocketbeagle.dts
 
@@ -39,16 +46,15 @@ index 7e2424957809..5a09ff15743b 100644
  	am335x-sl50.dtb \
 diff --git a/arch/arm/boot/dts/am335x-osd335x-common.dtsi b/arch/arm/boot/dts/am335x-osd335x-common.dtsi
 new file mode 100644
-index 000000000000..184b3a9f1538
+index 000000000000..d2150d207b7a
 --- /dev/null
 +++ b/arch/arm/boot/dts/am335x-osd335x-common.dtsi
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,124 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * Author: Robert Nelson <robertcnelson@gmail.com>
 + */
 +
 +/ {
@@ -80,7 +86,7 @@ index 000000000000..184b3a9f1538
 +};
 +
 +&am33xx_pinmux {
-+	i2c0_pins: pinmux_i2c0_pins {
++	i2c0_pins: pinmux-i2c0-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x988, PIN_INPUT_PULLUP | MUX_MODE0)	/* (C17) I2C0_SDA.I2C0_SDA */
 +			AM33XX_IOPAD(0x98c, PIN_INPUT_PULLUP | MUX_MODE0)	/* (C16) I2C0_SCL.I2C0_SCL */
@@ -97,17 +103,6 @@ index 000000000000..184b3a9f1538
 +
 +	tps: tps@24 {
 +		reg = <0x24>;
-+	};
-+
-+	baseboard_eeprom: baseboard_eeprom@50 {
-+		compatible = "atmel,24c256";
-+		reg = <0x50>;
-+
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		baseboard_data: baseboard_data@0 {
-+			reg = <0 0x100>;
-+		};
 +	};
 +};
 +
@@ -181,16 +176,15 @@ index 000000000000..184b3a9f1538
 +};
 diff --git a/arch/arm/boot/dts/am335x-pocketbeagle.dts b/arch/arm/boot/dts/am335x-pocketbeagle.dts
 new file mode 100644
-index 000000000000..c224cde88920
+index 000000000000..62fe5cab9fae
 --- /dev/null
 +++ b/arch/arm/boot/dts/am335x-pocketbeagle.dts
-@@ -0,0 +1,244 @@
+@@ -0,0 +1,237 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * Author: Robert Nelson <robertcnelson@gmail.com>
 + */
 +/dts-v1/;
 +
@@ -207,32 +201,32 @@ index 000000000000..c224cde88920
 +
 +	leds {
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&user_leds_s0>;
++		pinctrl-0 = <&usr_leds_pins>;
 +
 +		compatible = "gpio-leds";
 +
-+		usr_0_led {
++		usr0 {
 +			label = "beaglebone:green:usr0";
 +			gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
 +			linux,default-trigger = "heartbeat";
 +			default-state = "off";
 +		};
 +
-+		usr_1_led {
++		usr1 {
 +			label = "beaglebone:green:usr1";
 +			gpios = <&gpio1 22 GPIO_ACTIVE_HIGH>;
 +			linux,default-trigger = "mmc0";
 +			default-state = "off";
 +		};
 +
-+		usr_2_led {
++		usr2 {
 +			label = "beaglebone:green:usr2";
 +			gpios = <&gpio1 23 GPIO_ACTIVE_HIGH>;
 +			linux,default-trigger = "cpu0";
 +			default-state = "off";
 +		};
 +
-+		usr_3_led {
++		usr3 {
 +			label = "beaglebone:green:usr3";
 +			gpios = <&gpio1 24 GPIO_ACTIVE_HIGH>;
 +			default-state = "off";
@@ -248,26 +242,26 @@ index 000000000000..c224cde88920
 +};
 +
 +&am33xx_pinmux {
-+	i2c2_pins: pinmux_i2c2_pins {
++	i2c2_pins: pinmux-i2c2-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x97c, PIN_INPUT_PULLUP | MUX_MODE3)	/* (D17) uart1_rtsn.I2C2_SCL */
 +			AM33XX_IOPAD(0x978, PIN_INPUT_PULLUP | MUX_MODE3)	/* (D18) uart1_ctsn.I2C2_SDA */
 +		>;
 +	};
 +
-+	ehrpwm0_pins: pinmux_ehrpwm0_pins {
++	ehrpwm0_pins: pinmux-ehrpwm0-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x990, PIN_OUTPUT_PULLDOWN | MUX_MODE1)	/* (A13) mcasp0_aclkx.ehrpwm0A */
 +		>;
 +	};
 +
-+	ehrpwm1_pins: pinmux_ehrpwm1_pins {
++	ehrpwm1_pins: pinmux-ehrpwm1-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x848, PIN_OUTPUT_PULLDOWN | MUX_MODE6)	/* (U14) gpmc_a2.ehrpwm1A */
 +		>;
 +	};
 +
-+	mmc0_pins: pinmux_mmc0_pins {
++	mmc0_pins: pinmux-mmc0-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x960, PIN_INPUT | MUX_MODE7)		/* (C15) spi0_cs1.gpio0[6] */
 +			AM33XX_IOPAD(0x8fc, PIN_INPUT_PULLUP | MUX_MODE0)	/* (G16) mmc0_dat0.mmc0_dat0 */
@@ -280,7 +274,7 @@ index 000000000000..c224cde88920
 +		>;
 +	};
 +
-+	spi0_pins: pinmux_spi0_pins {
++	spi0_pins: pinmux-spi0-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x950, PIN_INPUT_PULLUP | MUX_MODE0)	/* (A17) spi0_sclk.spi0_sclk */
 +			AM33XX_IOPAD(0x954, PIN_INPUT_PULLUP | MUX_MODE0)	/* (B17) spi0_d0.spi0_d0 */
@@ -289,7 +283,7 @@ index 000000000000..c224cde88920
 +		>;
 +	};
 +
-+	spi1_pins: pinmux_spi1_pins {
++	spi1_pins: pinmux-spi1-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x964, PIN_INPUT_PULLUP | MUX_MODE4)	/* (C18) eCAP0_in_PWM0_out.spi1_sclk */
 +			AM33XX_IOPAD(0x968, PIN_INPUT_PULLUP | MUX_MODE4)	/* (E18) uart0_ctsn.spi1_d0 */
@@ -298,7 +292,7 @@ index 000000000000..c224cde88920
 +		>;
 +	};
 +
-+	user_leds_s0: user_leds_s0 {
++	usr_leds_pins: pinmux-usr-leds-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x854, PIN_OUTPUT | MUX_MODE7)		/* (V15) gpmc_a5.gpio1[21] - USR_LED_0 */
 +			AM33XX_IOPAD(0x858, PIN_OUTPUT | MUX_MODE7)		/* (U15) gpmc_a6.gpio1[22] - USR_LED_1 */
@@ -307,14 +301,14 @@ index 000000000000..c224cde88920
 +		>;
 +	};
 +
-+	uart0_pins: pinmux_uart0_pins {
++	uart0_pins: pinmux-uart0-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x970, PIN_INPUT_PULLUP | MUX_MODE0)	/* (E15) uart0_rxd.uart0_rxd */
 +			AM33XX_IOPAD(0x974, PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* (E16) uart0_txd.uart0_txd */
 +		>;
 +	};
 +
-+	uart4_pins: pinmux_uart4_pins {
++	uart4_pins: pinmux-uart4-pins {
 +		pinctrl-single,pins = <
 +			AM33XX_IOPAD(0x870, PIN_INPUT_PULLUP | MUX_MODE6)	/* (T17) gpmc_wait0.uart4_rxd */
 +			AM33XX_IOPAD(0x874, PIN_OUTPUT_PULLDOWN | MUX_MODE6)	/* (U17) gpmc_wpn.uart4_txd */
@@ -343,15 +337,9 @@ index 000000000000..c224cde88920
 +};
 +
 +&i2c0 {
-+	baseboard_eeprom: baseboard_eeprom@50 {
++	eeprom: eeprom@50 {
 +		compatible = "atmel,24c256";
 +		reg = <0x50>;
-+
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		baseboard_data: baseboard_data@0 {
-+			reg = <0 0x100>;
-+		};
 +	};
 +};
 +
