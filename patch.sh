@@ -294,7 +294,7 @@ local_patch () {
 #aufs4
 #rt
 #wireguard
-ti_pm_firmware
+#ti_pm_firmware
 #local_patch
 
 pre_backports () {
