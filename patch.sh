@@ -160,7 +160,7 @@ aufs4 () {
 
 		rm -rf ../aufs4-standalone/ || true
 
-		git reset --hard HEAD~5
+		${git_bin} reset --hard HEAD~5
 
 		start_cleanup
 
@@ -191,49 +191,8 @@ rt () {
 	echo "dir: rt"
 	rt_patch="${KERNEL_REL}${kernel_rt}"
 
-	#un-matched kernel
-	#regenerate="enable"
-	if [ "x${regenerate}" = "xenable" ] ; then
+	#${git_bin} revert --no-edit xyz
 
-		cd ../
-		if [ ! -d ./linux-rt-devel ] ; then
-			${git_bin} clone -b linux-4.14.y-rt-patches https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git --depth=1
-		else
-			rm -rf ./linux-rt-devel || true
-			${git_bin} clone -b linux-4.14.y-rt-patches https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git --depth=1
-		fi
-
-		cd ./KERNEL/
-
-		exit 2
-
-		#https://raphaelhertzog.com/2012/08/08/how-to-use-quilt-to-manage-patches-in-debian-packages/
-
-		#export QUILT_PATCHES=`pwd`/linux-rt-devel/patches
-		#export QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
-
-		#quilt push -a
-
-		quilt delete -r localversion.patch
-
-		#fix...
-		#quilt push -f
-		#quilt refresh
-
-		#final...
-		#quilt pop -a
-		#quilt push -a
-		#git add .
-		#git commit -a -m 'merge: CONFIG_PREEMPT_RT Patch Set' -s
-
-		exit 2
-	fi
-
-	if [ -d ../linux-rt-devel ] ; then
-		rm -rf ../linux-rt-devel || true
-	fi
-
-	#matched kernel
 	#regenerate="enable"
 	if [ "x${regenerate}" = "xenable" ] ; then
 		wget -c https://www.kernel.org/pub/linux/kernel/projects/rt/${KERNEL_REL}/patch-${rt_patch}.patch.xz
@@ -276,7 +235,7 @@ wireguard () {
 
 		rm -rf ../WireGuard/ || true
 
-		git reset --hard HEAD^
+		${git_bin} reset --hard HEAD^
 
 		start_cleanup
 
@@ -290,6 +249,42 @@ wireguard () {
 	${git} "${DIR}/patches/WireGuard/0001-merge-WireGuard.patch"
 }
 
+ti_pm_firmware () {
+	echo "dir: drivers/ti/firmware"
+	#regenerate="enable"
+	if [ "x${regenerate}" = "xenable" ] ; then
+
+		cd ../
+		if [ ! -d ./ti-amx3-cm3-pm-firmware ] ; then
+			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
+		else
+			rm -rf ./ti-amx3-cm3-pm-firmware || true
+			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
+		fi
+		cd ./KERNEL/
+
+		cp -v ../ti-amx3-cm3-pm-firmware/bin/am* ./firmware/
+
+		${git_bin} add -f ./firmware/am*
+		${git_bin} commit -a -m 'add am33x firmware' -s
+		${git_bin} format-patch -1 -o ../patches/drivers/ti/firmware/
+
+		rm -rf ../ti-amx3-cm3-pm-firmware/ || true
+
+		${git_bin} reset --hard HEAD^
+
+		start_cleanup
+
+		${git} "${DIR}/patches/drivers/ti/firmware/0001-add-am33x-firmware.patch"
+
+		wdir="drivers/ti/firmware"
+		number=1
+		cleanup
+	fi
+
+	${git} "${DIR}/patches/drivers/ti/firmware/0001-add-am33x-firmware.patch"
+}
+
 local_patch () {
 	echo "dir: dir"
 	${git} "${DIR}/patches/dir/0001-patch.patch"
@@ -299,6 +294,7 @@ local_patch () {
 #aufs4
 #rt
 #wireguard
+ti_pm_firmware
 #local_patch
 
 pre_backports () {
@@ -359,6 +355,7 @@ packaging () {
 	echo "dir: packaging"
 	#regenerate="enable"
 	if [ "x${regenerate}" = "xenable" ] ; then
+		cp -v "${DIR}/3rdparty/packaging/Makefile" "${DIR}/KERNEL/scripts/package"
 		cp -v "${DIR}/3rdparty/packaging/builddeb" "${DIR}/KERNEL/scripts/package"
 		#Needed for v4.11.x and less
 		#patch -p1 < "${DIR}/patches/packaging/0002-Revert-deb-pkg-Remove-the-KBUILD_IMAGE-workaround.patch"
