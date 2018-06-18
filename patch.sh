@@ -287,7 +287,8 @@ ti_pm_firmware () {
 
 local_patch () {
 	echo "dir: dir"
-	${git} "${DIR}/patches/dir/0001-patch.patch"
+#	${git} "${DIR}/patches/dir/0001-patch.patch"
+	${git} "${DIR}/patches/0001-Add-DT-support-for-Octavo-Systems-OSD3358-SM-RED-bas.patch"
 }
 
 #external_git
@@ -295,7 +296,7 @@ local_patch () {
 #rt
 #wireguard
 #ti_pm_firmware
-#local_patch
+local_patch
 
 pre_backports () {
 	echo "dir: backports/${subsystem}"
