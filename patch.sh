@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# Copyright (c) 2009-2019 Robert Nelson <robertcnelson@gmail.com>
+# Copyright (c) 2009-2020 Robert Nelson <robertcnelson@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -103,93 +103,12 @@ external_git () {
 	${git_bin} describe
 }
 
-aufs_fail () {
-	echo "aufs failed"
-	exit 2
-}
-
-aufs () {
-	echo "dir: aufs"
-	aufs_prefix="aufs5-"
-	#regenerate="enable"
-	if [ "x${regenerate}" = "xenable" ] ; then
-		wget https://raw.githubusercontent.com/sfjro/${aufs_prefix}standalone/aufs${KERNEL_REL}/${aufs_prefix}kbuild.patch
-		patch -p1 < ${aufs_prefix}kbuild.patch || aufs_fail
-		rm -rf ${aufs_prefix}kbuild.patch
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: aufs-kbuild' -s
-
-		wget https://raw.githubusercontent.com/sfjro/${aufs_prefix}standalone/aufs${KERNEL_REL}/${aufs_prefix}base.patch
-		patch -p1 < ${aufs_prefix}base.patch || aufs_fail
-		rm -rf ${aufs_prefix}base.patch
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: aufs-base' -s
-
-		wget https://raw.githubusercontent.com/sfjro/${aufs_prefix}standalone/aufs${KERNEL_REL}/${aufs_prefix}mmap.patch
-		patch -p1 < ${aufs_prefix}mmap.patch || aufs_fail
-		rm -rf ${aufs_prefix}mmap.patch
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: aufs-mmap' -s
-
-		wget https://raw.githubusercontent.com/sfjro/${aufs_prefix}standalone/aufs${KERNEL_REL}/${aufs_prefix}standalone.patch
-		patch -p1 < ${aufs_prefix}standalone.patch || aufs_fail
-		rm -rf ${aufs_prefix}standalone.patch
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: aufs-standalone' -s
-
-		${git_bin} format-patch -4 -o ../patches/aufs/
-
-		cd ../
-		if [ ! -d ./${aufs_prefix}standalone ] ; then
-			${git_bin} clone -b aufs${KERNEL_REL} https://github.com/sfjro/${aufs_prefix}standalone --depth=1
-		else
-			rm -rf ./${aufs_prefix}standalone || true
-			${git_bin} clone -b aufs${KERNEL_REL} https://github.com/sfjro/${aufs_prefix}standalone --depth=1
-		fi
-		cd ./KERNEL/
-
-		cp -v ../${aufs_prefix}standalone/Documentation/ABI/testing/*aufs ./Documentation/ABI/testing/
-		mkdir -p ./Documentation/filesystems/aufs/
-		cp -rv ../${aufs_prefix}standalone/Documentation/filesystems/aufs/* ./Documentation/filesystems/aufs/
-		mkdir -p ./fs/aufs/
-		cp -v ../${aufs_prefix}standalone/fs/aufs/* ./fs/aufs/
-		cp -v ../${aufs_prefix}standalone/include/uapi/linux/aufs_type.h ./include/uapi/linux/
-
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: aufs' -s
-		${git_bin} format-patch -5 -o ../patches/aufs/
-
-		rm -rf ../${aufs_prefix}standalone/ || true
-
-		${git_bin} reset --hard HEAD~5
-
-		start_cleanup
-
-		${git} "${DIR}/patches/aufs/0001-merge-aufs-kbuild.patch"
-		${git} "${DIR}/patches/aufs/0002-merge-aufs-base.patch"
-		${git} "${DIR}/patches/aufs/0003-merge-aufs-mmap.patch"
-		${git} "${DIR}/patches/aufs/0004-merge-aufs-standalone.patch"
-		${git} "${DIR}/patches/aufs/0005-merge-aufs.patch"
-
-		wdir="aufs"
-		number=5
-		cleanup
-	fi
-
-	${git} "${DIR}/patches/aufs/0001-merge-aufs-kbuild.patch"
-	${git} "${DIR}/patches/aufs/0002-merge-aufs-base.patch"
-	${git} "${DIR}/patches/aufs/0003-merge-aufs-mmap.patch"
-	${git} "${DIR}/patches/aufs/0004-merge-aufs-standalone.patch"
-	${git} "${DIR}/patches/aufs/0005-merge-aufs.patch"
-}
-
 rt_cleanup () {
 	echo "rt: needs fixup"
 	exit 2
 }
 
 rt () {
-	echo "dir: rt"
 	rt_patch="${KERNEL_REL}${kernel_rt}"
 
 	#${git_bin} revert --no-edit xyz
@@ -201,90 +120,14 @@ rt () {
 		rm -f patch-${rt_patch}.patch.xz
 		rm -f localversion-rt
 		${git_bin} add .
-		${git_bin} commit -a -m 'merge: CONFIG_PREEMPT_RT Patch Set' -s
+		${git_bin} commit -a -m 'merge: CONFIG_PREEMPT_RT Patch Set' -m "patch-${rt_patch}.patch.xz" -s
 		${git_bin} format-patch -1 -o ../patches/rt/
+		echo "RT: patch-${rt_patch}.patch.xz" > ../patches/git/RT
 
 		exit 2
 	fi
 
-	${git} "${DIR}/patches/rt/0001-merge-CONFIG_PREEMPT_RT-Patch-Set.patch"
-}
-
-wireguard_fail () {
-	echo "WireGuard failed"
-	exit 2
-}
-
-wireguard () {
-	echo "dir: WireGuard"
-	#regenerate="enable"
-	if [ "x${regenerate}" = "xenable" ] ; then
-		cd ../
-		if [ ! -d ./WireGuard ] ; then
-			${git_bin} clone https://git.zx2c4.com/WireGuard --depth=1
-		else
-			rm -rf ./WireGuard || true
-			${git_bin} clone https://git.zx2c4.com/WireGuard --depth=1
-		fi
-		cd ./KERNEL/
-
-		../WireGuard/contrib/kernel-tree/create-patch.sh | patch -p1 || wireguard_fail
-
-		${git_bin} add .
-		${git_bin} commit -a -m 'merge: WireGuard' -s
-		${git_bin} format-patch -1 -o ../patches/WireGuard/
-
-		rm -rf ../WireGuard/ || true
-
-		${git_bin} reset --hard HEAD^
-
-		start_cleanup
-
-		${git} "${DIR}/patches/WireGuard/0001-merge-WireGuard.patch"
-
-		wdir="WireGuard"
-		number=1
-		cleanup
-	fi
-
-	${git} "${DIR}/patches/WireGuard/0001-merge-WireGuard.patch"
-}
-
-ti_pm_firmware () {
-	#http://git.ti.com/gitweb/?p=processor-firmware/ti-amx3-cm3-pm-firmware.git;a=shortlog;h=refs/heads/ti-v4.1.y-next
-	echo "dir: drivers/ti/firmware"
-	#regenerate="enable"
-	if [ "x${regenerate}" = "xenable" ] ; then
-
-		cd ../
-		if [ ! -d ./ti-amx3-cm3-pm-firmware ] ; then
-			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
-		else
-			rm -rf ./ti-amx3-cm3-pm-firmware || true
-			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
-		fi
-		cd ./KERNEL/
-
-		cp -v ../ti-amx3-cm3-pm-firmware/bin/am* ./firmware/
-
-		${git_bin} add -f ./firmware/am*
-		${git_bin} commit -a -m 'add am33x firmware' -s
-		${git_bin} format-patch -1 -o ../patches/drivers/ti/firmware/
-
-		rm -rf ../ti-amx3-cm3-pm-firmware/ || true
-
-		${git_bin} reset --hard HEAD^
-
-		start_cleanup
-
-		${git} "${DIR}/patches/drivers/ti/firmware/0001-add-am33x-firmware.patch"
-
-		wdir="drivers/ti/firmware"
-		number=1
-		cleanup
-	fi
-
-	${git} "${DIR}/patches/drivers/ti/firmware/0001-add-am33x-firmware.patch"
+	dir 'rt'
 }
 
 local_patch () {
@@ -293,10 +136,7 @@ local_patch () {
 }
 
 #external_git
-#aufs
 #rt
-#wireguard
-#ti_pm_firmware
 #local_patch
 
 pre_backports () {
@@ -320,7 +160,7 @@ post_backports () {
 	fi
 
 	${git_bin} add .
-	${git_bin} commit -a -m "backports: ${subsystem}: from: linux.git" -s
+	${git_bin} commit -a -m "backports: ${subsystem}: from: linux.git" -m "Reference: ${backport_tag}" -s
 	if [ ! -d ../patches/backports/${subsystem}/ ] ; then
 		mkdir -p ../patches/backports/${subsystem}/
 	fi
