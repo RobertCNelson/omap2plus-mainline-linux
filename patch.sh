@@ -181,50 +181,6 @@ wireguard () {
 	dir 'WireGuard'
 }
 
-ti_pm_firmware () {
-	#http://git.ti.com/gitweb/?p=processor-firmware/ti-amx3-cm3-pm-firmware.git;a=shortlog;h=refs/heads/ti-v4.1.y-next
-	#regenerate="enable"
-	if [ "x${regenerate}" = "xenable" ] ; then
-
-		cd ../
-		if [ ! -d ./ti-amx3-cm3-pm-firmware ] ; then
-			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
-			cd ./ti-amx3-cm3-pm-firmware
-				ti_amx3_cm3_hash=$(git rev-parse HEAD)
-			cd -
-		else
-			rm -rf ./ti-amx3-cm3-pm-firmware || true
-			${git_bin} clone -b ti-v4.1.y-next git://git.ti.com/processor-firmware/ti-amx3-cm3-pm-firmware.git --depth=1
-			cd ./ti-amx3-cm3-pm-firmware
-				ti_amx3_cm3_hash=$(git rev-parse HEAD)
-			cd -
-		fi
-		cd ./KERNEL/
-
-		mkdir -p ./firmware/ || true
-		cp -v ../ti-amx3-cm3-pm-firmware/bin/am* ./firmware/
-
-		${git_bin} add -f ./firmware/am*
-		${git_bin} commit -a -m 'Add AM335x CM3 Power Managment Firmware' -m "http://git.ti.com/gitweb/?p=processor-firmware/ti-amx3-cm3-pm-firmware.git;a=commit;h=${ti_amx3_cm3_hash}" -s
-		${git_bin} format-patch -1 -o ../patches/drivers/ti/firmware/
-		echo "TI_AMX3_CM3: http://git.ti.com/gitweb/?p=processor-firmware/ti-amx3-cm3-pm-firmware.git;a=commit;h=${ti_amx3_cm3_hash}" > ../patches/git/TI_AMX3_CM3
-
-		rm -rf ../ti-amx3-cm3-pm-firmware/ || true
-
-		${git_bin} reset --hard HEAD^
-
-		start_cleanup
-
-		${git} "${DIR}/patches/drivers/ti/firmware/0001-Add-AM335x-CM3-Power-Managment-Firmware.patch"
-
-		wdir="drivers/ti/firmware"
-		number=1
-		cleanup
-	fi
-
-	dir 'drivers/ti/firmware'
-}
-
 local_patch () {
 	echo "dir: dir"
 	${git} "${DIR}/patches/dir/0001-patch.patch"
@@ -233,7 +189,6 @@ local_patch () {
 #external_git
 #rt
 #wireguard
-#ti_pm_firmware
 #local_patch
 
 pre_backports () {
