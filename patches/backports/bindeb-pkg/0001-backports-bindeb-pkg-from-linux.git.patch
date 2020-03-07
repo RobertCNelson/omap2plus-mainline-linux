@@ -1,21 +1,27 @@
-From 3baae9f1354e16d5cb5a586e3c1ceba77b35958c Mon Sep 17 00:00:00 2001
+From 208cd48df1b895d7c73a18966925b3ef589de813 Mon Sep 17 00:00:00 2001
 From: Robert Nelson <robertcnelson@gmail.com>
-Date: Fri, 6 Mar 2020 22:02:27 -0600
+Date: Fri, 6 Mar 2020 22:43:20 -0600
 Subject: [PATCH] backports: bindeb-pkg: from: linux.git
 
-Reference: v5.1
+Reference: v5.2.21
 Signed-off-by: Robert Nelson <robertcnelson@gmail.com>
 ---
- scripts/package/Makefile |  9 ++++----
+ scripts/package/Makefile | 12 +++++------
  scripts/package/builddeb | 42 +++++++++++++++++++++----------------
+ scripts/package/buildtar |  4 ++--
  scripts/package/mkdebian | 45 +++++++++++++++++++++++-----------------
- 3 files changed, 54 insertions(+), 42 deletions(-)
+ 4 files changed, 58 insertions(+), 45 deletions(-)
 
 diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 73503ebce632..2c6de21e5152 100644
+index 73503ebce632..ca7f46b562a4 100644
 --- a/scripts/package/Makefile
 +++ b/scripts/package/Makefile
-@@ -33,7 +33,6 @@ MKSPEC     := $(srctree)/scripts/package/mkspec
+@@ -1,3 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0-only
+ # Makefile for the different targets used to generate full packages of a kernel
+ # It uses the generic clean infrastructure of kbuild
+ 
+@@ -33,7 +34,6 @@ MKSPEC     := $(srctree)/scripts/package/mkspec
  
  quiet_cmd_src_tar = TAR     $(2).tar.gz
        cmd_src_tar = \
@@ -23,7 +29,7 @@ index 73503ebce632..2c6de21e5152 100644
  if test "$(objtree)" != "$(srctree)"; then \
  	echo >&2; \
  	echo >&2 "  ERROR:"; \
-@@ -60,7 +59,7 @@ rpm-pkg: FORCE
+@@ -60,7 +60,7 @@ rpm-pkg: FORCE
  # binrpm-pkg
  # ---------------------------------------------------------------------------
  binrpm-pkg: FORCE
@@ -32,7 +38,7 @@ index 73503ebce632..2c6de21e5152 100644
  	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
  	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
  		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
-@@ -73,11 +72,11 @@ deb-pkg: FORCE
+@@ -73,11 +73,11 @@ deb-pkg: FORCE
  	$(call cmd,src_tar,$(KDEB_SOURCENAME))
  	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
  		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
@@ -46,15 +52,17 @@ index 73503ebce632..2c6de21e5152 100644
  
  intdeb-pkg: FORCE
  	+$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
-@@ -103,7 +102,7 @@ clean-dirs += $(objtree)/snap/
+@@ -103,8 +103,8 @@ clean-dirs += $(objtree)/snap/
  # tarball targets
  # ---------------------------------------------------------------------------
  tar%pkg: FORCE
 -	$(MAKE) KBUILD_SRC=
+-	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
 +	$(MAKE) -f $(srctree)/Makefile
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
++	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
  
  clean-dirs += $(objtree)/tar-install/
+ 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
 index f43a274f4f1d..b03dd56a4782 100755
 --- a/scripts/package/builddeb
@@ -163,6 +171,21 @@ index f43a274f4f1d..b03dd56a4782 100755
  	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
  fi
  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index d624a07a4e77..2f66c81e4021 100755
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -56,8 +56,8 @@ dirs=boot
+ #
+ # Try to install modules
+ #
+-if grep -q '^CONFIG_MODULES=y' "${KCONFIG_CONFIG}"; then
+-	make ARCH="${ARCH}" O="${objtree}" KBUILD_SRC= INSTALL_MOD_PATH="${tmpdir}" modules_install
++if grep -q '^CONFIG_MODULES=y' include/config/auto.conf; then
++	make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_MOD_PATH="${tmpdir}" modules_install
+ 	dirs="$dirs lib"
+ fi
+ 
 diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
 index edcad61fe3cd..8351584cb24e 100755
 --- a/scripts/package/mkdebian
