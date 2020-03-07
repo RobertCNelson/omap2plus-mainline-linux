@@ -205,6 +205,7 @@ packaging () {
 
 			cp -v ~/linux-src/scripts/package/builddeb ./scripts/package/builddeb
 			cp -v ~/linux-src/scripts/package/mkdebian ./scripts/package/mkdebian
+			cp -v ~/linux-src/scripts/package/Makefile ./scripts/package/Makefile
 
 			post_backports
 			exit 2
