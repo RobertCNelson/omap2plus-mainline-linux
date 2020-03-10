@@ -1,21 +1,28 @@
-From 8fbc88628bd01a74aafb08b438d82df95c609b32 Mon Sep 17 00:00:00 2001
+From 0148cea385f54e16dbf2db1cb7fbba46712fb85b Mon Sep 17 00:00:00 2001
 From: Robert Nelson <robertcnelson@gmail.com>
-Date: Fri, 6 Mar 2020 21:56:50 -0600
+Date: Tue, 10 Mar 2020 16:37:43 -0500
 Subject: [PATCH] backports: bindeb-pkg: from: linux.git
 
-Reference: v5.1
+Reference: v5.2
 Signed-off-by: Robert Nelson <robertcnelson@gmail.com>
 ---
- scripts/package/Makefile |   9 ++--
+ scripts/package/Makefile |  12 ++---
  scripts/package/builddeb |  46 +++++++++-------
+ scripts/package/buildtar |  16 +++---
  scripts/package/mkdebian | 113 ++++++++++++++++++++++++++-------------
- 3 files changed, 107 insertions(+), 61 deletions(-)
+ scripts/package/mkspec   |  11 ++--
+ 5 files changed, 125 insertions(+), 73 deletions(-)
 
 diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 73503ebce632..2c6de21e5152 100644
+index 73503ebce632..ca7f46b562a4 100644
 --- a/scripts/package/Makefile
 +++ b/scripts/package/Makefile
-@@ -33,7 +33,6 @@ MKSPEC     := $(srctree)/scripts/package/mkspec
+@@ -1,3 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0-only
+ # Makefile for the different targets used to generate full packages of a kernel
+ # It uses the generic clean infrastructure of kbuild
+ 
+@@ -33,7 +34,6 @@ MKSPEC     := $(srctree)/scripts/package/mkspec
  
  quiet_cmd_src_tar = TAR     $(2).tar.gz
        cmd_src_tar = \
@@ -23,7 +30,7 @@ index 73503ebce632..2c6de21e5152 100644
  if test "$(objtree)" != "$(srctree)"; then \
  	echo >&2; \
  	echo >&2 "  ERROR:"; \
-@@ -60,7 +59,7 @@ rpm-pkg: FORCE
+@@ -60,7 +60,7 @@ rpm-pkg: FORCE
  # binrpm-pkg
  # ---------------------------------------------------------------------------
  binrpm-pkg: FORCE
@@ -32,7 +39,7 @@ index 73503ebce632..2c6de21e5152 100644
  	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
  	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
  		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
-@@ -73,11 +72,11 @@ deb-pkg: FORCE
+@@ -73,11 +73,11 @@ deb-pkg: FORCE
  	$(call cmd,src_tar,$(KDEB_SOURCENAME))
  	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
  		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
@@ -46,15 +53,17 @@ index 73503ebce632..2c6de21e5152 100644
  
  intdeb-pkg: FORCE
  	+$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
-@@ -103,7 +102,7 @@ clean-dirs += $(objtree)/snap/
+@@ -103,8 +103,8 @@ clean-dirs += $(objtree)/snap/
  # tarball targets
  # ---------------------------------------------------------------------------
  tar%pkg: FORCE
 -	$(MAKE) KBUILD_SRC=
+-	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
 +	$(MAKE) -f $(srctree)/Makefile
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
++	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
  
  clean-dirs += $(objtree)/tar-install/
+ 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
 index 90c9a8ac7adb..b03dd56a4782 100755
 --- a/scripts/package/builddeb
@@ -167,6 +176,47 @@ index 90c9a8ac7adb..b03dd56a4782 100755
  	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
  fi
  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index e8cc72a51b32..2f66c81e4021 100755
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -56,8 +56,8 @@ dirs=boot
+ #
+ # Try to install modules
+ #
+-if grep -q '^CONFIG_MODULES=y' "${KCONFIG_CONFIG}"; then
+-	make ARCH="${ARCH}" O="${objtree}" KBUILD_SRC= INSTALL_MOD_PATH="${tmpdir}" modules_install
++if grep -q '^CONFIG_MODULES=y' include/config/auto.conf; then
++	make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_MOD_PATH="${tmpdir}" modules_install
+ 	dirs="$dirs lib"
+ fi
+ 
+@@ -84,10 +84,6 @@ case "${ARCH}" in
+ 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
+ 		[ -f "${objtree}/lifimage" ] && cp -v -- "${objtree}/lifimage" "${tmpdir}/boot/lifimage-${KERNELRELEASE}"
+ 		;;
+-	vax)
+-		[ -f "${objtree}/vmlinux.SYS" ] && cp -v -- "${objtree}/vmlinux.SYS" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.SYS"
+-		[ -f "${objtree}/vmlinux.dsk" ] && cp -v -- "${objtree}/vmlinux.dsk" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.dsk"
+-		;;
+ 	mips)
+ 		if [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.bin" ]; then
+ 			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.bin" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
+@@ -109,6 +105,14 @@ case "${ARCH}" in
+ 			cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
+ 		fi
+ 		;;
++	arm64)
++		for i in Image.bz2 Image.gz Image.lz4 Image.lzma Image.lzo ; do
++			if [ -f "${objtree}/arch/arm64/boot/${i}" ] ; then
++				cp -v -- "${objtree}/arch/arm64/boot/${i}" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
++				break
++			fi
++		done
++		;;
+ 	*)
+ 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
+ 		echo "" >&2
 diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
 index 6adb3a16ba3b..8351584cb24e 100755
 --- a/scripts/package/mkdebian
@@ -363,6 +413,43 @@ index 6adb3a16ba3b..8351584cb24e 100755
 +chmod +x debian/rules
  
  exit 0
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index e05646dc24dc..009147d4718e 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -12,6 +12,7 @@
+ # how we were called determines which rpms we build and how we build them
+ if [ "$1" = prebuilt ]; then
+ 	S=DEL
++	MAKE="$MAKE -f $srctree/Makefile"
+ else
+ 	S=
+ fi
+@@ -78,19 +79,19 @@ $S	%prep
+ $S	%setup -q
+ $S
+ $S	%build
+-$S	make %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}
++$S	$MAKE %{?_smp_mflags} KBUILD_BUILD_VERSION=%{release}
+ $S
+ 	%install
+ 	mkdir -p %{buildroot}/boot
+ 	%ifarch ia64
+ 	mkdir -p %{buildroot}/boot/efi
+-	cp \$(make image_name) %{buildroot}/boot/efi/vmlinuz-$KERNELRELEASE
++	cp \$($MAKE image_name) %{buildroot}/boot/efi/vmlinuz-$KERNELRELEASE
+ 	ln -s efi/vmlinuz-$KERNELRELEASE %{buildroot}/boot/
+ 	%else
+-	cp \$(make image_name) %{buildroot}/boot/vmlinuz-$KERNELRELEASE
++	cp \$($MAKE image_name) %{buildroot}/boot/vmlinuz-$KERNELRELEASE
+ 	%endif
+-$M	make %{?_smp_mflags} INSTALL_MOD_PATH=%{buildroot} KBUILD_SRC= modules_install
+-	make %{?_smp_mflags} INSTALL_HDR_PATH=%{buildroot}/usr KBUILD_SRC= headers_install
++$M	$MAKE %{?_smp_mflags} INSTALL_MOD_PATH=%{buildroot} modules_install
++	$MAKE %{?_smp_mflags} INSTALL_HDR_PATH=%{buildroot}/usr headers_install
+ 	cp System.map %{buildroot}/boot/System.map-$KERNELRELEASE
+ 	cp .config %{buildroot}/boot/config-$KERNELRELEASE
+ 	bzip2 -9 --keep vmlinux
 -- 
 2.25.1
 
