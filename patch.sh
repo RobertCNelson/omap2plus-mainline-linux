@@ -203,8 +203,7 @@ packaging () {
 		if [ "x${regenerate}" = "xenable" ] ; then
 			pre_backports
 
-			cp -v ~/linux-src/scripts/package/builddeb ./scripts/package/builddeb
-			cp -v ~/linux-src/scripts/package/mkdebian ./scripts/package/mkdebian
+			cp -v ~/linux-src/scripts/package/* ./scripts/package/
 
 			post_backports
 			exit 2
