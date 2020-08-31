@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm 5.9.0-rc2 Kernel Configuration
+# Linux/arm 5.9.0-rc3 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="arm-none-linux-gnueabihf-gcc (GNU Toolchain for the A-profile Architecture 9.2-2019.12 (arm-9.10)) 9.2.1 20191025"
 CONFIG_CC_IS_GCC=y
@@ -2425,7 +2425,6 @@ CONFIG_SERIAL_OF_PLATFORM=y
 # CONFIG_SERIAL_EARLYCON_ARM_SEMIHOST is not set
 # CONFIG_SERIAL_MAX3100 is not set
 # CONFIG_SERIAL_MAX310X is not set
-# CONFIG_SERIAL_IMX_EARLYCON is not set
 # CONFIG_SERIAL_UARTLITE is not set
 CONFIG_SERIAL_CORE=y
 CONFIG_SERIAL_CORE_CONSOLE=y
