@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# Copyright (c) 2009-2020 Robert Nelson <robertcnelson@gmail.com>
+# Copyright (c) 2009-2021 Robert Nelson <robertcnelson@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -196,7 +196,7 @@ backports () {
 packaging () {
 	#do_backport="enable"
 	if [ "x${do_backport}" = "xenable" ] ; then
-		backport_tag="v5.6-rc4"
+		backport_tag="v5.10.31"
 
 		subsystem="bindeb-pkg"
 		#regenerate="enable"
