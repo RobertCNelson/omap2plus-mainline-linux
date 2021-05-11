@@ -43,8 +43,8 @@ toolchain="gcc_10_arm"
 #toolchain="gcc_10_riscv64"
 
 #Kernel
-KERNEL_REL=5.12
-KERNEL_TAG=${KERNEL_REL}
+KERNEL_REL=5.13
+KERNEL_TAG=${KERNEL_REL}-rc1
 kernel_rt=".X-rtY"
 #Kernel Build
 BUILD=${build_prefix}0
