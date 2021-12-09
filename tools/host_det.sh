@@ -424,16 +424,13 @@ debian_regs () {
 		#Devuan: Compatibility Matrix
 		#https://en.wikipedia.org/wiki/Devuan
 		case "${deb_distro}" in
-		ASCII)
-			deb_distro="stretch"
-			;;
-		Beowulf)
+		beowulf)
 			deb_distro="buster"
 			;;
-		Chimaera)
+		chimaera)
 			deb_distro="bullseye"
 			;;
-		Daedalus)
+		daedalus)
 			deb_distro="bookworm"
 			;;
 		esac
