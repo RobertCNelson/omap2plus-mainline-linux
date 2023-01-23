@@ -41,7 +41,7 @@ toolchain="gcc_12_arm"
 
 #Kernel
 KERNEL_REL=6.2
-KERNEL_TAG=${KERNEL_REL}-rc4
+KERNEL_TAG=${KERNEL_REL}-rc5
 kernel_rt=".X-rtY"
 #Kernel Build
 BUILD=${build_prefix}0
