@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm 6.6.0-rc1 Kernel Configuration
+# Linux/arm 6.6.0-rc2 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="arm-linux-gnueabi-gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -2936,7 +2936,6 @@ CONFIG_I2C_BOARDINFO=y
 CONFIG_I2C_COMPAT=y
 CONFIG_I2C_CHARDEV=y
 # CONFIG_I2C_MUX is not set
-# CONFIG_I2C_ATR is not set
 CONFIG_I2C_HELPER_AUTO=y
 
 #
