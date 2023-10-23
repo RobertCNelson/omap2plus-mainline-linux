@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm 6.6.0-rc6 Kernel Configuration
+# Linux/arm 6.6.0-rc7 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="arm-linux-gnueabi-gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -6714,8 +6714,6 @@ CONFIG_GENERIC_PHY=y
 CONFIG_PHY_CPCAP_USB=m
 CONFIG_PHY_MAPPHONE_MDM6600=m
 # CONFIG_PHY_OCELOT_SERDES is not set
-# CONFIG_PHY_RTK_RTD_USB2PHY is not set
-# CONFIG_PHY_RTK_RTD_USB3PHY is not set
 CONFIG_PHY_DM816X_USB=m
 CONFIG_OMAP_CONTROL_PHY=y
 CONFIG_OMAP_USB2=m
