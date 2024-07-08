@@ -19,8 +19,8 @@ DEBARCH=armhf
 #toolchain="gcc_10_arm"
 #toolchain="gcc_11_arm"
 #toolchain="gcc_12_arm"
-toolchain="gcc_13_arm"
-#toolchain="gcc_14_arm"
+#toolchain="gcc_13_arm"
+toolchain="gcc_14_arm"
 #arm64
 #KERNEL_ARCH=arm64
 #DEBARCH=arm64
@@ -47,7 +47,7 @@ toolchain="gcc_13_arm"
 
 #Kernel
 KERNEL_REL=6.10
-KERNEL_TAG=${KERNEL_REL}-rc6
+KERNEL_TAG=${KERNEL_REL}-rc7
 kernel_rt=".X-rtY"
 #Kernel Build
 BUILD=${build_prefix}1
