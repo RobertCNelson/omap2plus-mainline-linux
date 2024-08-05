@@ -8,7 +8,7 @@ build_prefix="-omap2plus-r"
 branch_prefix="v"
 branch_postfix=".x"
 
-#https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/changes.rst?h=v6.10-rc1
+#https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/changes.rst?h=v6.11-rc1
 #arm
 KERNEL_ARCH=arm
 DEBARCH=armhf
@@ -46,8 +46,8 @@ toolchain="gcc_14_arm"
 #toolchain="gcc_14_riscv64"
 
 #Kernel
-KERNEL_REL=6.10
-KERNEL_TAG=${KERNEL_REL}
+KERNEL_REL=6.11
+KERNEL_TAG=${KERNEL_REL}-rc2
 kernel_rt=".X-rtY"
 #Kernel Build
 BUILD=${build_prefix}1
