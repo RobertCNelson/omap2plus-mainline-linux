@@ -47,7 +47,7 @@ toolchain="gcc_14_arm"
 
 #Kernel
 KERNEL_REL=6.11
-KERNEL_TAG=${KERNEL_REL}-rc2
+KERNEL_TAG=${KERNEL_REL}-rc3
 kernel_rt=".X-rtY"
 #Kernel Build
 BUILD=${build_prefix}1
