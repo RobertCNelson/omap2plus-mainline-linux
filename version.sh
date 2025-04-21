@@ -8,7 +8,10 @@ build_prefix="-omap2plus-r"
 branch_prefix="v"
 branch_postfix=".x"
 
+#Changes
 #https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/changes.rst?h=v6.15-rc1
+#
+#Cross Compilers
 #arm
 KERNEL_ARCH=arm
 DEBARCH=armhf
