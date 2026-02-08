@@ -17,6 +17,7 @@ branch_postfix=".x"
 #https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/changes.rst?h=v6.19-rc1
 #
 #Cross Compilers
+#https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/
 #arm
 KERNEL_ARCH=arm
 DEBARCH=armhf
@@ -53,14 +54,14 @@ toolchain="gcc_15_arm"
 
 #Wireless:
 #https://mirrors.edge.kernel.org/pub/software/network/wireless-regdb/
-WIRELESS_REGDB="2025.10.07"
+WIRELESS_REGDB="2026.02.04"
 
 #Kernel
 linux_repo="https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git"
 linux_stable_repo="https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux.git"
 #
 KERNEL_REL=6.19
-KERNEL_TAG=${KERNEL_REL}-rc8
+KERNEL_TAG=${KERNEL_REL}
 #https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/x.y/
 kernel_rt=".X-rtY"
 #Kernel Build
