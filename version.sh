@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # SPDX-FileCopyrightText: Robert Nelson <robertcnelson@gmail.com>
-#
 # SPDX-License-Identifier: MIT
 
 #
@@ -57,7 +56,7 @@ toolchain="gcc_16_arm"
 
 #Wireless:
 #https://git.kernel.org/pub/scm/linux/kernel/git/wens/wireless-regdb.git
-WIRELESS_REGDB="2026-05-30"
+WIRELESS_REGDB="2026-09-03"
 
 #Kernel
 linux_repo="https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git"
